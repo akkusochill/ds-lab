@@ -1,0 +1,180 @@
+#include <stdio.h>
+
+void simple_Transpose(int comp[][3], int B[][3])
+{
+    int p = 1;
+    int n = comp[0][1];
+
+    B[0][0] = comp[0][1];
+    B[0][1] = comp[0][0];
+    B[0][2] = comp[0][2];
+
+    for (int k = 0; k < n; k++)
+    {
+        for (int j = 1; j <= comp[0][2]; j++)
+        {
+            if (comp[j][1] == k)
+            {
+                B[p][0] = comp[j][1];
+                B[p][1] = comp[j][0];
+                B[p][2] = comp[j][2];
+                p++;
+            }
+        }
+    }
+}
+
+void Fast_Transpose(int comp[][3], int B[][3])
+{
+    int m, n, t;
+    int total[10] = {0};
+    int index[10];
+
+    m = comp[0][0];
+    n = comp[0][1];
+    t = comp[0][2];
+
+    B[0][0] = n;
+    B[0][1] = m;
+    B[0][2] = t;
+
+    for (int i = 1; i <= t; i++)
+    {
+        total[comp[i][1]]++;
+    }
+
+    index[0] = 1;
+
+    for (int i = 1; i < n; i++)
+    {
+        index[i] = index[i - 1] + total[i - 1];
+    }
+
+    /* Place elements directly */
+    for (int i = 1; i <= t; i++)
+    {
+        int column = comp[i][1];
+        int loc = index[column];
+
+        B[loc][0] = comp[i][1];
+        B[loc][1] = comp[i][0];
+        B[loc][2] = comp[i][2];
+
+        index[column]++;
+    }
+}
+
+void accept(int sparse[][10], int m, int n)
+{
+    printf("Enter the elements of sparse matrix:\n");
+
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            scanf("%d", &sparse[i][j]);
+        }
+    }
+}
+
+void display(int sparse[][10], int m, int n)
+{
+    printf("\nSparse Matrix:\n");
+
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            printf("%d\t", sparse[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+void compact(int sparse[][10], int m, int n, int comp[][3])
+{
+    int k = 1;
+
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            if (sparse[i][j] != 0)
+            {
+                comp[k][0] = i;
+                comp[k][1] = j;
+                comp[k][2] = sparse[i][j];
+                k++;
+            }
+        }
+    }
+
+    comp[0][0] = m;
+    comp[0][1] = n;
+    comp[0][2] = k - 1;
+
+    printf("\nCompact Matrix:\n");
+
+    for (int i = 0; i < k; i++)
+    {
+        printf("%d\t%d\t%d\n",
+               comp[i][0],
+               comp[i][1],
+               comp[i][2]);
+    }
+}
+
+void display_compact(int comp[][3])
+{
+    int rows = comp[0][2] + 1;
+
+    printf("\nResultant Compact Matrix:\n");
+
+    for (int i = 0; i < rows; i++)
+    {
+        printf("%d\t%d\t%d\n",
+               comp[i][0],
+               comp[i][1],
+               comp[i][2]);
+    }
+}
+
+int main()
+{
+    int sparse[10][10];
+    int comp[100][3];
+    int B[100][3];
+    int m, n, ch;
+
+    printf("Enter number of rows and columns: ");
+    scanf("%d%d", &m, &n);
+
+    accept(sparse, m, n);
+
+    display(sparse, m, n);
+
+    compact(sparse, m, n, comp);
+
+    printf("\n1. Simple Transpose");
+    printf("\n2. Fast Transpose");
+    printf("\nEnter your choice: ");
+    scanf("%d", &ch);
+
+    switch (ch)
+    {
+    case 1:
+        simple_Transpose(comp, B);
+        display_compact(B);
+        break;
+
+    case 2:
+        Fast_Transpose(comp, B);
+        display_compact(B);
+        break;
+
+    default:
+        printf("Invalid Choice!");
+    }
+
+    return 0;
+}
