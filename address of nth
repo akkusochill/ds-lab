@@ -1,0 +1,22 @@
+//program to find the address of nth element when base address is given. 
+
+int main()
+{
+    int row, col;
+    int base, size;
+    int cols=3;
+    printf("Enter base address: ");
+    scanf("%d", &base);
+    printf("Enter size of each element:");
+    scanf("%d", &size);
+    
+    printf("Enter row index:");
+    scanf("%d", &row);
+    
+    printf("Enter column index:");
+    scanf("%d", &col);
+    
+    int address = base +((row*col)+cols)*size;
+    printf("Size of your element at [%d][%d] is %d:", row, col, address);
+    return 0;
+}
