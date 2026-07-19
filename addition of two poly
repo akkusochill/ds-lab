@@ -1,0 +1,34 @@
+#include <stdio.h>
+int main() {
+int degree , i;
+printf("Enter the degree of the polynomials : \n");
+scanf("%d", &degree);
+int p[degree+1], q[degree+1], r[degree+1];
+printf("Enter coefficient of p polynomial: ");
+for(int i =degree; i>=0; i--){
+printf("Coefficient of x^%d =", i);
+scanf("%d", &p[i]);
+}
+
+printf("Enter coefficient of second poly:");
+for(int i =degree; i>=0; i--){
+printf("Coefficient of x^%d =", i);
+scanf("%d", &q[i]);
+
+}
+for(int i=0; i<=degree; i++) {
+r[i]= p[i]+q[i];
+    
+}
+printf("Resultant poly:\n");
+for(i=degree; i>=0; i--){
+if (r[i]!=0) {
+printf("%dx^%d", r[i], i);
+if(i > 0)
+printf(" + ");
+}
+}
+printf("\n");
+return 0;
+
+}
