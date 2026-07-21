@@ -36,3 +36,43 @@ scanf("%d", &a[i]);
         printf("Element not found");
     return 0;
 }
+
+
+
+
+// recursive method
+
+#include <stdio.h>
+int binarysearch(int a[], int low, int high, int target){
+if(low<=high){
+int mid =(low+high)/2;
+if(a[mid]==target)
+return mid;
+else if (target< a[mid)
+return binarysearch(a, low, mid-1, target);
+else 
+return binarysearch(a, mid+1, high, target);
+}
+return -1
+}
+
+int main()
+{
+int n, target;
+printf("Enter number of elements:");
+scanf("%d", &n);
+int a[n];
+printf("Enter sorted elements);
+for (int i=0; i<n; i++)
+scanf("%d", &a[i]);
+printf("enter key to search:");
+scanf("%d", &key);
+int result= binarysearch(a, 0, n-1, target);
+
+if(result!=-1)
+printf("ele found at %d index", result);
+else
+printf("ele not found");
+return 0;
+
+}
