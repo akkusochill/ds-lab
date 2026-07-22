@@ -1,5 +1,4 @@
 #include <stdio.h>
-
 void simple_Transpose(int comp[][3], int B[][3])
 {
     int p = 1;
@@ -23,7 +22,6 @@ void simple_Transpose(int comp[][3], int B[][3])
         }
     }
 }
-
 void Fast_Transpose(int comp[][3], int B[][3])
 {
     int m, n, t;
@@ -63,7 +61,6 @@ void Fast_Transpose(int comp[][3], int B[][3])
         index[column]++;
     }
 }
-
 void accept(int sparse[][10], int m, int n)
 {
     printf("Enter the elements of sparse matrix:\n");
@@ -76,7 +73,6 @@ void accept(int sparse[][10], int m, int n)
         }
     }
 }
-
 void display(int sparse[][10], int m, int n)
 {
     printf("\nSparse Matrix:\n");
@@ -90,11 +86,9 @@ void display(int sparse[][10], int m, int n)
         printf("\n");
     }
 }
-
 void compact(int sparse[][10], int m, int n, int comp[][3])
 {
     int k = 1;
-
     for (int i = 0; i < m; i++)
     {
         for (int j = 0; j < n; j++)
@@ -108,7 +102,6 @@ void compact(int sparse[][10], int m, int n, int comp[][3])
             }
         }
     }
-
     comp[0][0] = m;
     comp[0][1] = n;
     comp[0][2] = k - 1;
@@ -123,13 +116,10 @@ void compact(int sparse[][10], int m, int n, int comp[][3])
                comp[i][2]);
     }
 }
-
 void display_compact(int comp[][3])
 {
     int rows = comp[0][2] + 1;
-
     printf("\nResultant Compact Matrix:\n");
-
     for (int i = 0; i < rows; i++)
     {
         printf("%d\t%d\t%d\n",
@@ -138,35 +128,27 @@ void display_compact(int comp[][3])
                comp[i][2]);
     }
 }
-
 int main()
 {
     int sparse[10][10];
     int comp[100][3];
     int B[100][3];
     int m, n, ch;
-
     printf("Enter number of rows and columns: ");
     scanf("%d%d", &m, &n);
-
     accept(sparse, m, n);
-
     display(sparse, m, n);
-
     compact(sparse, m, n, comp);
-
     printf("\n1. Simple Transpose");
     printf("\n2. Fast Transpose");
     printf("\nEnter your choice: ");
     scanf("%d", &ch);
-
     switch (ch)
     {
     case 1:
         simple_Transpose(comp, B);
         display_compact(B);
         break;
-
     case 2:
         Fast_Transpose(comp, B);
         display_compact(B);
@@ -175,6 +157,5 @@ int main()
     default:
         printf("Invalid Choice!");
     }
-
     return 0;
 }
