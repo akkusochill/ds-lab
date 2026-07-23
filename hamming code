@@ -1,0 +1,118 @@
+#include <stdio.h>
+
+void generateHamming();
+void detectError();
+
+int main()
+{
+    int choice;
+
+    while (1)
+    {
+        printf("      HAMMING CODE \n");
+        printf("=====================================\n");
+        printf("1. Generate Hamming Code\n");
+        printf("2. Detect & Correct Error\n");
+        printf("3. Exit\n");
+        printf("Enter Choice: ");
+        scanf("%d", &choice);
+
+        switch (choice)
+        {
+        case 1:
+            generateHamming();
+            break;
+
+        case 2:
+            detectError();
+            break;
+
+        case 3:
+            printf("\nThank you!\n");
+            return 0;
+
+        default:
+            printf("\nInvalid Choice!\n");
+        }
+    }
+}
+
+void generateHamming()
+{
+    int h[8];
+
+    printf("\nEnter 4 data bits (0 or 1)\n");
+
+    printf("D1 : ");
+    scanf("%d",&h[3]);
+
+    printf("D2 : ");
+    scanf("%d",&h[5]);
+
+    printf("D3 : ");
+    scanf("%d",&h[6]);
+
+    printf("D4 : ");
+    scanf("%d",&h[7]);
+
+    h[1]=h[3]^h[5]^h[7];
+    h[2]=h[3]^h[6]^h[7];
+    h[4]=h[5]^h[6]^h[7];
+
+    printf("\nParity Bits\n");
+    printf("P1 = D1 ^ D2 ^ D4 = %d\n",h[1]);
+    printf("P2 = D1 ^ D3 ^ D4 = %d\n",h[2]);
+    printf("P4 = D2 ^ D3 ^ D4 = %d\n",h[4]);
+
+    printf("\nGenerated Hamming Code:\n");
+
+    for(int i=1;i<=7;i++)
+        printf("%d ",h[i]);
+
+    printf("\n");
+}
+
+void detectError()
+{
+    int h[8];
+    int p1,p2,p4;
+    int error;
+
+    printf("\nEnter received 7-bit Hamming code\n");
+
+    for(int i=1;i<=7;i++)
+    {
+        printf("Bit %d : ",i);
+        scanf("%d",&h[i]);
+    }
+
+    p1=h[1]^h[3]^h[5]^h[7];
+    p2=h[2]^h[3]^h[6]^h[7];
+    p4=h[4]^h[5]^h[6]^h[7];
+
+    error=p4*4+p2*2+p1;
+
+    printf("\nSyndrome Bits\n");
+    printf("P4=%d P2=%d P1=%d\n",p4,p2,p1);
+
+    if(error==0)
+    {
+        printf("\nNo Error Detected.\n");
+    }
+    else
+    {
+        printf("\nError Detected at Position %d\n",error);
+
+        h[error]=!h[error];
+
+        printf("Corrected Code:\n");
+
+        for(int i=1;i<=7;i++)
+            printf("%d ",h[i]);
+
+        printf("\n");
+    }
+
+    printf("\nRecovered Data Bits:\n");
+    printf("%d %d %d %d\n",h[3],h[5],h[6],h[7]);
+}
