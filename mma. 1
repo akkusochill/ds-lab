@@ -1,0 +1,66 @@
+section .data
+    msg db "Sum of array elements = ",0
+    msglen equ $-msg
+
+    arr db 12h,62h,25h,37h,50h
+    count equ 5
+
+    result db "000H",10
+    newline db 10
+
+section .text
+global _start
+
+_start:
+
+    xor ax,ax
+    mov rsi,arr
+    mov rcx,count
+
+again:
+    add al,[rsi]
+    adc ah,0
+    inc rsi
+    loop again
+
+    mov bx,ax
+
+    mov al,bh
+    call hex_digit
+    mov [result],al
+
+    mov al,bl
+    shr al,4
+    call hex_digit
+    mov [result+1],al
+
+    mov al,bl
+    and al,0Fh
+    call hex_digit
+    mov [result+2],al
+
+    mov rax,1
+    mov rdi,1
+    mov rsi,msg
+    mov rdx,msglen
+    syscall
+
+    mov rax,1
+    mov rdi,1
+    mov rsi,result
+    mov rdx,5
+    syscall
+
+    mov rax,60
+    xor rdi,rdi
+    syscall
+
+hex_digit:
+    cmp al,9
+    jbe digit
+    add al,37h
+    ret
+
+digit:
+    add al,30h
+    ret
