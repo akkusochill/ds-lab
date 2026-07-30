@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <math.h>
+int main()
+{
+int data[20], code[30];
+int m, r = 0, i, j, k = 1;
+int received[30];
+int error = 0;
+printf("Enter number of data bits: ");
+scanf("%d"
+, &m);
+// Find number of parity bits
+while ((1 << r) < (m + r + 1))
+r++;
+printf("Enter %d data bits:\n"
+, m);
+// Read data bits from MSB to LSB
+for (i = m; i >= 1; i--)
+scanf("%d"
+, &data[i]);
+// Place data and parity bits
+j = m;
+for (i = 1; i <= m + r; i++)
+{
+if ((i & (i - 1)) == 0)
+code[i] = 0; // Parity bit
+else
+code[i] = data[j--];
+}
+// Calculate parity bits
+for (i = 0; i < r; i++)
+{
+int position = 1 << i;
+int parity = 0;
+for (j = 1; j <= m + r; j++)
+{
+if (j & position)
+parity ^= code[j];
+}
+code[position] = parity;
+}
+printf("\nGenerated Hamming Code:\n");
+for (i = m + r; i >= 1; i--)
+printf("%d "
+, code[i]);
+printf("\n");
+printf("\nReceiver Side\n");
+printf("Enter received code (%d bits):\n"
+, m + r);
+for (i = m + r; i >= 1; i--)
+scanf("%d"
+, &received[i]);
+// Check parity
+for (i = 0; i < r; i++)
+{
+int position = 1 << i;
+int parity = 0;
+for (j = 1; j <= m + r; j++)
+{
+if (j & position)
+parity ^= received[j];
+}
+if (parity)
+error += position;
+}
+if (error == 0)
+{
+printf("\nNo Error Detected.\n");
+}
+{
+else
+printf("\nError detected at position %d\n"
+, error);
+// Correct error
+received[error] ^= 1;
+printf("Corrected Code:\n");
+for (i = m + r; i >= 1; i--)
+printf("%d "
+, received[i]);
+printf("\n");
+}
+return 0;
+}
