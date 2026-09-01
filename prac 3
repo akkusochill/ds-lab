@@ -1,90 +1,90 @@
 #include <stdio.h>
 
+#define MAX 100
+
 struct Student
 {
-    int roll;
+    int rollNo;
     char name[50];
     float marks;
 };
 
-void accept(struct Student s[], int n)
+void displayStudents(struct Student s[], int n)
 {
-    for(int i = 0; i < n; i++)
+    int i;
+    printf("STUDENT DATABASE\n");
+
+
+    for (i = 0; i < n; i++)
     {
-        printf("\nEnter details of Student %d\n", i + 1);
-
-        printf("Roll No: ");
-        scanf("%d", &s[i].roll);
-
-        printf("Name: ");
-        scanf("%s", s[i].name);
-
-        printf("Marks: ");
-        scanf("%f", &s[i].marks);
+        printf("\nStudent %d\n", i + 1);
+        printf("Roll Number : %d\n", s[i].rollNo);
+        printf("Name        : %s\n", s[i].name);
+        printf("Marks       : %.2f\n", s[i].marks);
     }
+
 }
 
-void display(struct Student s[], int n)
+void linearSearch(struct Student s[], int n, int key)
 {
-    printf("\n-----------------------------------------\n");
-    printf("Roll No\tName\tMarks\n");
-    printf("-----------------------------------------\n");
+    int i;
 
-    for(int i = 0; i < n; i++)
+    for (i = 0; i < n; i++)
     {
-        printf("%d\t%s\t%.2f\n", s[i].roll, s[i].name, s[i].marks);
-    }
-}
-
-void bubbleSort(struct Student s[], int n)
-{
-    struct Student temp;
-
-    for(int i = 0; i < n - 1; i++)
-    {
-        for(int j = 0; j < n - i - 1; j++)
+        if (s[i].rollNo == key)
         {
-            if(s[j].roll > s[j + 1].roll)
-            {
-                temp = s[j];
-                s[j] = s[j + 1];
-                s[j + 1] = temp;
-            }
+            printf("\nstudent Found!\n");
+            printf("Roll Number : %d\n", s[i].rollNo);
+            printf("Name        : %s\n", s[i].name);
+            printf("Marks       : %.2f\n", s[i].marks);
+            return;
         }
     }
+
+    printf("\nStudent not found!\n");
 }
 
-void selectionSort(struct Student s[], int n)
+void binarySearch(struct Student s[], int n, int key)
 {
-    struct Student temp;
-    int min;
-
-    for(int i = 0; i < n - 1; i++)
+    int low = 0;
+    int high = n - 1;
+    int mid;
+    while (low <= high)
     {
-        min = i;
+        mid = (low + high) / 2;
 
-        for(int j = i + 1; j < n; j++)
+        if (s[mid].rollNo == key)
         {
-            if(s[j].roll < s[min].roll)
-                min = j;
+            printf("\nStudent Found!\n");
+            printf("Roll Number : %d\n", s[mid].rollNo);
+            printf("Name        : %s\n", s[mid].name);
+            printf("Marks       : %.2f\n", s[mid].marks);
+            return;
         }
-
-        temp = s[i];
-        s[i] = s[min];
-        s[min] = temp;
+        else if (key < s[mid].rollNo)
+        {
+            high = mid - 1;
+        }
+        else
+        {
+            low = mid + 1;
+        }
     }
+
+    printf("\nStudent not found!\n");
 }
 
 void insertionSort(struct Student s[], int n)
 {
+    int i, j;
     struct Student key;
 
-    for(int i = 1; i < n; i++)
+    for (i = 1; i < n; i++)
     {
         key = s[i];
-        int j = i - 1;
+        j = i - 1;
 
-        while(j >= 0 && s[j].roll > key.roll)
+        while (j >= 0 && s[j].rollNo > key.rollNo)
         {
             s[j + 1] = s[j];
             j--;
@@ -92,49 +92,143 @@ void insertionSort(struct Student s[], int n)
 
         s[j + 1] = key;
     }
+
+    printf("\nStudents sorted using Insertion Sort.\n");
+}
+
+void selectionSort(struct Student s[], int n)
+{
+    int i, j, min;
+    struct Student temp;
+
+    for (i = 0; i < n - 1; i++)
+    {
+        min = i;
+
+        for (j = i + 1; j < n; j++)
+        {
+            if (s[j].rollNo < s[min].rollNo)
+            {
+                min = j;
+            }
+        }
+
+        temp = s[i];
+        s[i] = s[min];
+        s[min] = temp;
+    }
+
+    printf("\nStudents sorted using Selection Sort.\n");
+}
+
+void shellSort(struct Student s[], int n)
+{
+    int gap, i, j;
+    struct Student temp;
+
+    for (gap = n / 2; gap > 0; gap = gap / 2)
+    {
+        for (i = gap; i < n; i++)
+        {
+            temp = s[i];
+            j = i;
+
+            while (j >= gap && s[j - gap].rollNo > temp.rollNo)
+            {
+                s[j] = s[j - gap];
+                j = j - gap;
+            }
+
+            s[j] = temp;
+        }
+    }
+
+    printf("\nStudents sorted using Shell Sort.\n");
 }
 
 int main()
 {
-    int n, choice;
+    struct Student s[MAX];
+    int n, i, choice, key;
 
     printf("Enter number of students: ");
     scanf("%d", &n);
 
-    struct Student s[n];
-
-    accept(s, n);
-
-    printf("\nChoose Sorting Method");
-    printf("\n1. Bubble Sort");
-    printf("\n2. Selection Sort");
-    printf("\n3. Insertion Sort");
-    printf("\nEnter choice: ");
-    scanf("%d", &choice);
-
-    switch(choice)
+    if (n <= 0 || n > MAX)
     {
-        case 1:
-            bubbleSort(s, n);
-            printf("\nStudents Sorted using Bubble Sort\n");
-            break;
-
-        case 2:
-            selectionSort(s, n);
-            printf("\nStudents Sorted using Selection Sort\n");
-            break;
-
-        case 3:
-            insertionSort(s, n);
-            printf("\nStudents Sorted using Insertion Sort\n");
-            break;
-
-        default:
-            printf("Invalid Choice!\n");
-            return 0;
+        printf("Invalid number of students!\n");
+        return 0;
     }
 
-    display(s, n);
+    for (i = 0; i < n; i++)
+    {
+        printf("\nEnter details of Student %d\n", i + 1);
+
+        printf("Enter Roll Number: ");
+        scanf("%d", &s[i].rollNo);
+
+        printf("Enter Name: ");
+        scanf(" %[^\n]", s[i].name);
+
+        printf("Enter Marks: ");
+        scanf("%f", &s[i].marks);
+    }
+
+    do
+    {
+        printf("\n1. Display Students\n");
+        printf("2. Linear Search\n");
+        printf("3. Insertion Sort\n");
+        printf("4. Selection Sort\n");
+        printf("5. Shell Sort\n");
+        printf("6. Binary Search\n");
+        printf("7. Exit\n");
+
+        printf("\nEnter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice)
+        {
+            case 1:
+                displayStudents(s, n);
+                break;
+
+            case 2:
+                printf("Enter Roll Number to search: ");
+                scanf("%d", &key);
+                linearSearch(s, n, key);
+                break;
+
+            case 3:
+                insertionSort(s, n);
+                displayStudents(s, n);
+                break;
+
+            case 4:
+                selectionSort(s, n);
+                displayStudents(s, n);
+                break;
+
+            case 5:
+                shellSort(s, n);
+                displayStudents(s, n);
+                break;
+
+            case 6:
+                printf("Enter Roll Number to search: ");
+                scanf("%d", &key);
+                binarySearch(s, n, key);
+                break;
+
+            case 7:
+                printf("\nExiting...\n");
+                break;
+
+            default:
+                printf("\nInvalid Choice!\n");
+        }
+
+    } while (choice != 7);
 
     return 0;
 }
