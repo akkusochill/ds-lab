@@ -1,0 +1,130 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX 5
+
+struct PrintJob {
+    int jobID;
+    char documentTitle[50];
+};
+
+struct PrintJob queue[MAX];
+
+int front = -1;
+int rear = -1;
+
+void enqueue() {
+    struct PrintJob job;
+
+    /* Overflow condition */
+    if (rear == MAX - 1) {
+        printf("\nQueue Overflow! Print queue is full.\n");
+        return;
+    }
+
+    /* First element */
+    if (front == -1) {
+        front = 0;
+    }
+
+    printf("\nEnter Job ID: ");
+    scanf("%d", &job.jobID);
+
+    printf("Enter Document Title: ");
+    scanf(" %[^\n]", job.documentTitle);
+
+    rear++;
+    queue[rear] = job;
+
+    printf("Print job added successfully.\n");
+}
+
+void dequeue() {
+
+    /* Underflow condition */
+    if (front == -1 || front > rear) {
+        printf("\nQueue Underflow! No print jobs available.\n");
+        return;
+    }
+
+    printf("\nProcessing Print Job...\n");
+    printf("Job ID: %d\n", queue[front].jobID);
+    printf("Document Title: %s\n", queue[front].documentTitle);
+
+    front++;
+
+    /* Queue becomes empty */
+    if (front > rear) {
+        front = -1;
+        rear = -1;
+    }
+
+    printf("Print job processed and removed successfully.\n");
+}
+
+/* Display Operation */
+void display() {
+    int i;
+
+    /* Empty queue */
+    if (front == -1) {
+        printf("\nNo Pending Print Jobs.\n");
+        return;
+    }
+
+    printf("\nPending Print Jobs:\n");
+    printf("-------------------------------\n");
+    printf("Job ID\tDocument Title\n");
+    printf("-------------------------------\n");
+
+    for (i = front; i <= rear; i++) {
+        printf("%d\t%s\n",
+               queue[i].jobID,
+               queue[i].documentTitle);
+    }
+}
+
+int main() {
+    int choice;
+
+    printf("=====================================\n");
+    printf("       PRINTER QUEUE MANAGER\n");
+    printf("         LINEAR QUEUE\n");
+    printf("=====================================\n");
+
+    do {
+        printf("\n\n----- MENU -----\n");
+        printf("1. Enqueue Print Job\n");
+        printf("2. Dequeue Print Job\n");
+        printf("3. Display Queue\n");
+        printf("4. Exit\n");
+
+        printf("\nEnter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+
+            case 1:
+                enqueue();
+                break;
+
+            case 2:
+                dequeue();
+                break;
+
+            case 3:
+                display();
+                break;
+
+            case 4:
+                printf("\nProgram terminated successfully.\n");
+                break;
+
+            default:
+                printf("\nInvalid choice! Please try again.\n");
+        }
+
+    } while (choice != 4);
+
+    return 0;
+}
