@@ -1,0 +1,247 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct Node
+{
+    int regNo;
+    char name[50];
+    struct Node *next;
+};
+
+struct Node *head = NULL;
+
+/* Add a student */
+void addStudent()
+{
+    struct Node *newNode;
+    
+    newNode = (struct Node *)malloc(sizeof(struct Node));
+
+    if (newNode == NULL)
+    {
+        printf("Memory allocation failed.\n");
+        return;
+    }
+
+    printf("Enter Registration Number: ");
+    scanf("%d", &newNode->regNo);
+
+    printf("Enter Student Name: ");
+    scanf(" %[^\n]", newNode->name);
+
+    newNode->next = NULL;
+
+    if (head == NULL)
+    {
+        head = newNode;
+    }
+    else
+    {
+        struct Node *temp = head;
+
+        while (temp->next != NULL)
+        {
+            temp = temp->next;
+        }
+
+        temp->next = newNode;
+    }
+
+    printf("Student is added successfully.\n");
+}
+
+/* Remove a student */
+void removeStudent()
+{
+    int regNo;
+    struct Node *temp = head;
+    struct Node *prev = NULL;
+
+    if (head == NULL)
+    {
+        printf("No students registered.\n");
+        return;
+    }
+
+    printf("Enter Registration Number to remove: ");
+    scanf("%d", &regNo);
+
+    /* If first node is to be deleted */
+    if (head->regNo == regNo)
+    {
+        head = head->next;
+        free(temp);
+
+        printf("Student record is deleted successfully.\n");
+        return;
+    }
+
+    /* Search for the student */
+    while (temp != NULL && temp->regNo != regNo)
+    {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    if (temp == NULL)
+    {
+        printf("Student not found.\n");
+        return;
+    }
+
+    prev->next = temp->next;
+    free(temp);
+
+    printf("Student record is deleted successfully.\n");
+}
+
+/* Display students */
+void displayStudents()
+{
+    struct Node *temp = head;
+
+    if (head == NULL)
+    {
+        printf("No students registered.\n");
+        return;
+    }
+
+    printf("\n--- Workshop Participants ---\n");
+
+    while (temp != NULL)
+    {
+        printf("RegNo: %d\tName: %s\n",
+               temp->regNo, temp->name);
+
+        temp = temp->next;
+    }
+}
+
+/* Count total participants */
+void countStudents()
+{
+    int count = 0;
+    struct Node *temp = head;
+
+    while (temp != NULL)
+    {
+        count++;
+        temp = temp->next;
+    }
+
+    printf("Total Participants: %d\n", count);
+}
+
+/* Sort students by Registration Number */
+void sortStudents()
+{
+    struct Node *i, *j;
+    int tempRegNo;
+    char tempName[50];
+
+    if (head == NULL || head->next == NULL)
+    {
+        printf("List is already sorted.\n");
+        return;
+    }
+
+    for (i = head; i != NULL; i = i->next)
+    {
+        for (j = i->next; j != NULL; j = j->next)
+        {
+            if (i->regNo > j->regNo)
+            {
+                /* Swap registration number */
+                tempRegNo = i->regNo;
+                i->regNo = j->regNo;
+                j->regNo = tempRegNo;
+
+                /* Swap name */
+                strcpy(tempName, i->name);
+                strcpy(i->name, j->name);
+                strcpy(j->name, tempName);
+            }
+        }
+    }
+
+    printf("List sorted successfully.\n");
+}
+
+/* Reverse the linked list */
+void reverseList()
+{
+    struct Node *prev = NULL;
+    struct Node *current = head;
+    struct Node *next = NULL;
+
+    while (current != NULL)
+    {
+        next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+    }
+
+    head = prev;
+
+    printf("List reversed successfully.\n");
+}
+
+/* Main function */
+int main()
+{
+    int choice;
+
+    do
+    {
+        printf("\n========== WORKSHOP ENROLLMENT SYSTEM ==========\n");
+        printf("1. Add Student\n");
+        printf("2. Remove Student\n");
+        printf("3. Display Students\n");
+        printf("4. Count Total Participants\n");
+        printf("5. Sort Students\n");
+        printf("6. Reverse List\n");
+        printf("7. Exit\n");
+
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice)
+        {
+            case 1:
+                addStudent();
+                break;
+
+            case 2:
+                removeStudent();
+                break;
+
+            case 3:
+                displayStudents();
+                break;
+
+            case 4:
+                countStudents();
+                break;
+
+            case 5:
+                sortStudents();
+                break;
+
+            case 6:
+                reverseList();
+                break;
+
+            case 7:
+                printf("Exiting program...\n");
+                break;
+
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+
+    } while (choice != 7);
+
+    return 0;
+}
