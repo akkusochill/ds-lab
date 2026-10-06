@@ -1,0 +1,234 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int coeff;
+    int exp;
+    struct Node *next;
+};
+
+typedef struct Node Node;
+
+/* Create a new node */
+Node* createNode(int coeff, int exp) {
+    Node *newNode = (Node*)malloc(sizeof(Node));
+
+    newNode->coeff = coeff;
+    newNode->exp = exp;
+    newNode->next = NULL;
+
+    return newNode;
+}
+
+/* Insert a term in descending order of exponent */
+void insertTerm(Node **head, int coeff, int exp) {
+    Node *newNode, *temp;
+
+    if (coeff == 0)
+        return;
+
+    newNode = createNode(coeff, exp);
+
+    /* Empty circular linked list */
+    if (*head == NULL) {
+        *head = newNode;
+        newNode->next = *head;
+        return;
+    }
+
+    /* If exponent already exists */
+    temp = *head;
+    do {
+        if (temp->exp == exp) {
+            temp->coeff += coeff;
+
+            if (temp->coeff == 0) {
+                /* Removing the node */
+                Node *prev = *head;
+
+                while (prev->next != temp)
+                    prev = prev->next;
+
+                if (temp == *head) {
+                    if (temp->next == temp) {
+                        *head = NULL;
+                    } else {
+                        *head = temp->next;
+                        prev->next = *head;
+                    }
+                } else {
+                    prev->next = temp->next;
+                }
+
+                free(temp);
+            }
+
+            free(newNode);
+            return;
+        }
+
+        temp = temp->next;
+    } while (temp != *head);
+
+    /* Insert before head if exponent is greater */
+    if (exp > (*head)->exp) {
+        temp = *head;
+
+        while (temp->next != *head)
+            temp = temp->next;
+
+        newNode->next = *head;
+        temp->next = newNode;
+        *head = newNode;
+        return;
+    }
+
+    /* Find appropriate position */
+    temp = *head;
+
+    while (temp->next != *head &&
+           temp->next->exp > exp) {
+        temp = temp->next;
+    }
+
+    newNode->next = temp->next;
+    temp->next = newNode;
+}
+
+/* Create polynomial */
+Node* createPolynomial() {
+    Node *head = NULL;
+    int n, coeff, exp;
+
+    printf("Enter number of terms: ");
+    scanf("%d", &n);
+
+    for (int i = 0; i < n; i++) {
+        printf("Enter coefficient and exponent: ");
+        scanf("%d %d", &coeff, &exp);
+
+        insertTerm(&head, coeff, exp);
+    }
+
+    return head;
+}
+
+/* Display polynomial */
+void displayPolynomial(Node *head) {
+    Node *temp;
+
+    if (head == NULL) {
+        printf("0");
+        return;
+    }
+
+    temp = head;
+
+    do {
+        if (temp != head && temp->coeff > 0)
+            printf(" + ");
+
+        if (temp->coeff < 0) {
+            if (temp == head)
+                printf("-");
+            else
+                printf(" - ");
+        }
+
+        int coeff = abs(temp->coeff);
+
+        if (temp->exp == 0) {
+            printf("%d", coeff);
+        }
+        else if (temp->exp == 1) {
+            if (coeff != 1)
+                printf("%d", coeff);
+            printf("x");
+        }
+        else {
+            if (coeff != 1)
+                printf("%d", coeff);
+            printf("x^%d", temp->exp);
+        }
+
+        temp = temp->next;
+
+    } while (temp != head);
+}
+
+/* Add two polynomials */
+Node* addPolynomial(Node *p1, Node *p2) {
+    Node *result = NULL;
+    Node *temp;
+
+    /* Copy terms from first polynomial */
+    if (p1 != NULL) {
+        temp = p1;
+
+        do {
+            insertTerm(&result, temp->coeff, temp->exp);
+            temp = temp->next;
+        } while (temp != p1);
+    }
+
+    /* Add terms from second polynomial */
+    if (p2 != NULL) {
+        temp = p2;
+
+        do {
+            insertTerm(&result, temp->coeff, temp->exp);
+            temp = temp->next;
+        } while (temp != p2);
+    }
+
+    return result;
+}
+
+/* Free circular linked list */
+void freePolynomial(Node *head) {
+    Node *temp, *next;
+
+    if (head == NULL)
+        return;
+
+    temp = head->next;
+
+    while (temp != head) {
+        next = temp->next;
+        free(temp);
+        temp = next;
+    }
+
+    free(head);
+}
+
+/* Main function */
+int main() {
+    Node *P1, *P2, *P3;
+
+    printf("\n--- Create Polynomial 1 ---\n");
+    P1 = createPolynomial();
+
+    printf("\nPolynomial 1: ");
+    displayPolynomial(P1);
+
+    printf("\n\n--- Create Polynomial 2 ---\n");
+    P2 = createPolynomial();
+
+    printf("\nPolynomial 2: ");
+    displayPolynomial(P2);
+
+    /* Addition */
+    P3 = addPolynomial(P1, P2);
+
+    printf("\n\nResultant Polynomial: ");
+    displayPolynomial(P3);
+
+    printf("\n");
+
+    freePolynomial(P1);
+    freePolynomial(P2);
+    freePolynomial(P3);
+
+    return 0;
+}
