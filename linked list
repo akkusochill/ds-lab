@@ -60,7 +60,7 @@ void removeStudent() {
         return;
     }
 
-    printf("\nEnter Registration Number to remove: ");
+    printf("\nEnter registration number to remove: ");
     scanf("%d", &regNo);
 
     temp = head;
@@ -103,7 +103,6 @@ void displayList() {
 
     temp = head;
 
-    printf("\n====================================\n");
     printf("        REGISTERED STUDENTS\n");
     printf("====================================\n");
     printf("Reg No\t\tName\n");
