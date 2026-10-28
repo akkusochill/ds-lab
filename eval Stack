@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <ctype.h>
+
+#define MAX 100
+
+int stack[MAX];
+int top = -1;
+
+void push(int value) {
+    stack[++top] = value;
+}
+
+int pop(void) {
+    return stack[top--];
+}
+
+int main(void) {
+    char expression[MAX];
+    int i, left, right;
+
+    printf("Enter a postfix expression (example: 35+4*): ");
+    scanf("%s", expression);
+
+    for (i = 0; expression[i] != '\0'; i++) {
+        char ch = expression[i];
+
+        if (isdigit(ch)) {
+            push(ch - '0');   /* Convert character digit to integer */
+        } else {
+            right = pop();
+            left = pop();
+
+            switch (ch) {
+                case '+': push(left + right); break;
+                case '-': push(left - right); break;
+                case '*': push(left * right); break;
+                case '/': push(left / right); break;
+            }
+        }
+    }
+
+    printf("Result = %d\n", pop());
+    return 0;
+}
