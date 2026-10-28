@@ -1,0 +1,279 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+#define MAX 100
+
+char stack[MAX];
+int top = -1;
+
+void push(char value) {
+    if (top == MAX - 1) {
+        printf("Stack overflow.\n");
+        return;
+    }
+    stack[++top] = value;
+}
+
+char pop(void) {
+    if (top == -1) {
+        return '\0';
+    }
+    return stack[top--];
+}
+
+char peek(void) {
+    if (top == -1) {
+        return '\0';
+    }
+    return stack[top];
+}
+
+int isOperator(char ch) {
+    return ch == '+' || ch == '-' || ch == '*' ||
+           ch == '/' || ch == '^';
+}
+
+int precedence(char op) {
+    switch (op) {
+        case '^': return 3;
+        case '*':
+        case '/': return 2;
+        case '+':
+        case '-': return 1;
+        default:  return 0;
+    }
+}
+
+/* Infix to postfix: scan left to right. */
+void infixToPostfix(char infix[], char postfix[]) {
+    int i, k = 0;
+    char ch;
+
+    top = -1;
+
+    for (i = 0; infix[i] != '\0'; i++) {
+        ch = infix[i];
+
+        if (isspace((unsigned char)ch)) {
+            continue;
+        }
+
+        if (isalnum((unsigned char)ch)) {
+            postfix[k++] = ch;
+        } else if (ch == '(') {
+            push(ch);
+        } else if (ch == ')') {
+            while (top != -1 && peek() != '(') {
+                postfix[k++] = pop();
+            }
+            if (top != -1) {
+                pop(); /* discard '(' */
+            }
+        } else if (isOperator(ch)) {
+            while (top != -1 && isOperator(peek()) &&
+                   (precedence(peek()) > precedence(ch) ||
+                   (precedence(peek()) == precedence(ch) && ch != '^'))) {
+                postfix[k++] = pop();
+            }
+            push(ch);
+        }
+    }
+
+    while (top != -1) {
+        postfix[k++] = pop();
+    }
+
+    postfix[k] = '\0';
+}
+
+/* Reverse a string in place. */
+void reverseString(char str[]) {
+    int left = 0;
+    int right = (int)strlen(str) - 1;
+    char temp;
+
+    while (left < right) {
+        temp = str[left];
+        str[left] = str[right];
+        str[right] = temp;
+        left++;
+        right--;
+    }
+}
+
+/* Infix to prefix using reverse + infix-to-postfix. */
+void infixToPrefix(char infix[], char prefix[]) {
+    char reversed[MAX];
+    char postfix[MAX];
+    int i, len = (int)strlen(infix);
+
+    strcpy(reversed, infix);
+    reverseString(reversed);
+
+    for (i = 0; i < len; i++) {
+        if (reversed[i] == '(') {
+            reversed[i] = ')';
+        } else if (reversed[i] == ')') {
+            reversed[i] = '(';
+        }
+    }
+
+    infixToPostfix(reversed, postfix);
+    strcpy(prefix, postfix);
+    reverseString(prefix);
+}
+
+/* Join two strings with an operator between them. */
+void combine(char left[], char op, char right[], char result[]) {
+    result[0] = '\0';
+    strncat(result, left, MAX - strlen(result) - 1);
+    strncat(result, &op, 1);
+    strncat(result, right, MAX - strlen(result) - 1);
+}
+
+/* Postfix to infix: operands are pushed; operators combine two items. */
+void postfixToInfix(char postfix[], char infix[]) {
+    char exprStack[MAX][MAX];
+    int exprTop = -1;
+    int i;
+
+    for (i = 0; postfix[i] != '\0'; i++) {
+        char ch = postfix[i];
+
+        if (isspace((unsigned char)ch)) {
+            continue;
+        }
+
+        if (isalnum((unsigned char)ch)) {
+            exprStack[++exprTop][0] = ch;
+            exprStack[exprTop][1] = '\0';
+        } else if (isOperator(ch) && exprTop >= 1) {
+            char right[MAX], left[MAX], result[MAX];
+
+            strcpy(right, exprStack[exprTop--]);
+            strcpy(left, exprStack[exprTop--]);
+
+            result[0] = '(';
+            result[1] = '\0';
+            strncat(result, left, MAX - strlen(result) - 1);
+            strncat(result, &ch, 1);
+            strncat(result, right, MAX - strlen(result) - 1);
+            strncat(result, ")", MAX - strlen(result) - 1);
+
+            strcpy(exprStack[++exprTop], result);
+        } else {
+            printf("Invalid postfix expression.\n");
+            infix[0] = '\0';
+            return;
+        }
+    }
+
+    if (exprTop == 0) {
+        strcpy(infix, exprStack[0]);
+    } else {
+        printf("Invalid postfix expression.\n");
+        infix[0] = '\0';
+    }
+}
+
+/* Prefix to infix: scan right to left. */
+void prefixToInfix(char prefix[], char infix[]) {
+    char exprStack[MAX][MAX];
+    int exprTop = -1;
+    int i;
+
+    for (i = (int)strlen(prefix) - 1; i >= 0; i--) {
+        char ch = prefix[i];
+
+        if (isspace((unsigned char)ch)) {
+            continue;
+        }
+
+        if (isalnum((unsigned char)ch)) {
+            exprStack[++exprTop][0] = ch;
+            exprStack[exprTop][1] = '\0';
+        } else if (isOperator(ch) && exprTop >= 1) {
+            char left[MAX], right[MAX], result[MAX];
+
+            strcpy(left, exprStack[exprTop--]);
+            strcpy(right, exprStack[exprTop--]);
+
+            result[0] = '(';
+            result[1] = '\0';
+            strncat(result, left, MAX - strlen(result) - 1);
+            strncat(result, &ch, 1);
+            strncat(result, right, MAX - strlen(result) - 1);
+            strncat(result, ")", MAX - strlen(result) - 1);
+
+            strcpy(exprStack[++exprTop], result);
+        } else {
+            printf("Invalid prefix expression.\n");
+            infix[0] = '\0';
+            return;
+        }
+    }
+
+    if (exprTop == 0) {
+        strcpy(infix, exprStack[0]);
+    } else {
+        printf("Invalid prefix expression.\n");
+        infix[0] = '\0';
+    }
+}
+
+int main(void) {
+    int choice;
+    char expression[MAX];
+    char result[MAX];
+
+    do {
+        printf("\n--- STACK: EXPRESSION CONVERSION ---\n");
+        printf("1. Infix to Postfix\n");
+        printf("2. Infix to Prefix\n");
+        printf("3. Postfix to Infix\n");
+        printf("4. Prefix to Infix\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+
+        if (scanf("%d", &choice) != 1) {
+            printf("Invalid input.\n");
+            return 1;
+        }
+
+        if (choice >= 1 && choice <= 4) {
+            printf("Enter expression: ");
+            scanf(" %99[^\n]", expression);
+        }
+
+        switch (choice) {
+            case 1:
+                infixToPostfix(expression, result);
+                printf("Postfix: %s\n", result);
+                break;
+            case 2:
+                infixToPrefix(expression, result);
+                printf("Prefix: %s\n", result);
+                break;
+            case 3:
+                postfixToInfix(expression, result);
+                if (result[0] != '\0') {
+                    printf("Infix: %s\n", result);
+                }
+                break;
+            case 4:
+                prefixToInfix(expression, result);
+                if (result[0] != '\0') {
+                    printf("Infix: %s\n", result);
+                }
+                break;
+            case 5:
+                printf("Exiting.\n");
+                break;
+            default:
+                printf("Invalid choice.\n");
+        }
+    } while (choice != 5);
+
+    return 0;
+}
