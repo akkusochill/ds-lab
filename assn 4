@@ -1,0 +1,79 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct Node {
+    int regNo;
+    char name[50];
+    struct Node *next;
+};
+
+struct Node *head = NULL;
+
+void addStudent(void) {
+    struct Node *newNode, *current;
+
+    newNode = malloc(sizeof(struct Node));
+    if (newNode == NULL) {
+        printf("Memory allocation failed.\n");
+        return;
+    }
+
+    printf("Enter registration number: ");
+    scanf("%d", &newNode->regNo);
+
+    printf("Enter student name: ");
+    scanf(" %49[^\n]", newNode->name);
+
+    newNode->next = NULL;
+
+    if (head == NULL) {
+        head = newNode;
+    } else {
+        current = head;
+        while (current->next != NULL) {
+            current = current->next;
+        }
+        current->next = newNode;
+    }
+
+    printf("Student added successfully.\n");
+}
+
+void removeStudent(void) {
+    int key;
+    struct Node *current = head;
+    struct Node *previous = NULL;
+
+    printf("Enter registration number to remove: ");
+    scanf("%d", &key);
+
+    while (current != NULL && current->regNo != key) {
+        previous = current;
+        current = current->next;
+    }
+
+    if (current == NULL) {
+        printf("Student not found.\n");
+        return;
+    }
+
+    if (previous == NULL) {
+        head = current->next;
+    } else {
+        previous->next = current->next;
+    }
+
+    free(current);
+    printf("Student removed successfully.\n");
+}
+
+void displayStudents(void) {
+    struct Node *current = head;
+
+    if (head == NULL) {
+        printf("No students registered.\n");
+        return;
+    }
+
+    printf("\nRegistered
