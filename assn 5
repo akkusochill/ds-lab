@@ -1,0 +1,169 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int coefficient;
+    int exponent;
+    struct Node *next;
+};
+
+struct Node *createNode(int coefficient, int exponent) {
+    struct Node *newNode = malloc(sizeof(struct Node));
+
+    if (newNode == NULL) {
+        printf("Memory allocation failed.\n");
+        exit(1);
+    }
+
+    newNode->coefficient = coefficient;
+    newNode->exponent = exponent;
+    newNode->next = NULL;
+
+    return newNode;
+}
+
+/* Insert terms in descending exponent order.
+   Combine terms with the same exponent. */
+void insertTerm(struct Node **head, int coefficient, int exponent) {
+    struct Node *current;
+    struct Node *previous;
+    struct Node *newNode;
+
+    if (coefficient == 0) {
+        return;
+    }
+
+    newNode = createNode(coefficient, exponent);
+
+    /* Empty list: the only node points to itself. */
+    if (*head == NULL) {
+        newNode->next = newNode;
+        *head = newNode;
+        return;
+    }
+
+    /* Same exponent as the first node. */
+    if ((*head)->exponent == exponent) {
+        (*head)->coefficient += coefficient;
+        free(newNode);
+        return;
+    }
+
+    /* Insert before head if this exponent is larger. */
+    if (exponent > (*head)->exponent) {
+        current = *head;
+        while (current->next != *head) {
+            current = current->next;
+        }
+
+        newNode->next = *head;
+        current->next = newNode;
+        *head = newNode;
+        return;
+    }
+
+    previous = *head;
+    current = (*head)->next;
+
+    while (current != *head && current->exponent > exponent) {
+        previous = current;
+        current = current->next;
+    }
+
+    /* Combine an existing exponent. */
+    if (current != *head && current->exponent == exponent) {
+        current->coefficient += coefficient;
+        free(newNode);
+        return;
+    }
+
+    /* Insert between previous and current. */
+    newNode->next = current;
+    previous->next = newNode;
+}
+
+void createPolynomial(struct Node **head) {
+    int terms;
+    int coefficient;
+    int exponent;
+    int i;
+
+    printf("How many terms? ");
+    scanf("%d", &terms);
+
+    for (i = 0; i < terms; i++) {
+        printf("Enter coefficient and exponent: ");
+        scanf("%d%d", &coefficient, &exponent);
+        insertTerm(head, coefficient, exponent);
+    }
+}
+
+void displayPolynomial(struct Node *head) {
+    struct Node *current;
+
+    if (head == NULL) {
+        printf("0\n");
+        return;
+    }
+
+    current = head;
+
+    do {
+        printf("%dx^%d", current->coefficient, current->exponent);
+        current = current->next;
+
+        if (current != head) {
+            printf(" + ");
+        }
+    } while (current != head);
+
+    printf("\n");
+}
+
+struct Node *addPolynomials(struct Node *poly1, struct Node *poly2) {
+    struct Node *result = NULL;
+    struct Node *current;
+
+    if (poly1 != NULL) {
+        current = poly1;
+        do {
+            insertTerm(&result, current->coefficient, current->exponent);
+            current = current->next;
+        } while (current != poly1);
+    }
+
+    if (poly2 != NULL) {
+        current = poly2;
+        do {
+            insertTerm(&result, current->coefficient, current->exponent);
+            current = current->next;
+        } while (current != poly2);
+    }
+
+    return result;
+}
+
+int main(void) {
+    struct Node *poly1 = NULL;
+    struct Node *poly2 = NULL;
+    struct Node *sum;
+
+    printf("Create first polynomial\n");
+    createPolynomial(&poly1);
+
+    printf("Create second polynomial\n");
+    createPolynomial(&poly2);
+
+    printf("First polynomial: ");
+    displayPolynomial(poly1);
+
+    printf("Second polynomial: ");
+    displayPolynomial(poly2);
+
+    sum = addPolynomials(poly1, poly2);
+
+    printf("Sum: ");
+    displayPolynomial(sum);
+
+    return 0;
+}
